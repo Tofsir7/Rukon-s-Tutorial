@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Alert from '../../components/Alert';
 import { SITE } from '../../utils/constants';
@@ -9,9 +9,16 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccess('Registration successful! Please log in to continue.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,6 +45,7 @@ const LoginPage = () => {
         </div>
 
         <Alert type="error" message={error} onClose={() => setError('')} />
+        <Alert type="success" message={success} onClose={() => setSuccess('')} />
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -52,6 +60,15 @@ const LoginPage = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-primary-600 font-semibold hover:text-primary-700">
+              Register here
+            </Link>
+          </p>
+        </div>
 
         <div className="mt-6 p-4 bg-gray-50 rounded-lg text-xs text-gray-500">
           <p className="font-medium text-gray-700 mb-2">Demo Credentials:</p>

@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const initialForm = {
   studentName: '',
+  studentEmail: '',
   studentPhone: '',
   guardianPhone: '',
   batchId: '',
@@ -51,6 +52,7 @@ const AdmissionPage = () => {
         setForm((prev) => ({
           ...prev,
           studentName: user?.name || prev.studentName,
+          studentEmail: user?.email || prev.studentEmail,
           batchId: selectedBatchId || prev.batchId || data[0]?._id || '',
         }));
       })
@@ -88,7 +90,7 @@ const AdmissionPage = () => {
       };
       await api.post('/admissions', payload);
       setAlert({ type: 'success', message: 'Admission request submitted successfully. You can track it in your student portal.' });
-      setForm({ ...initialForm, studentName: user?.name || '', batchId: form.batchId });
+      setForm({ ...initialForm, studentName: user?.name || '', studentEmail: user?.email || '', batchId: form.batchId });
     } catch (err) {
       setAlert({ type: 'error', message: err.response?.data?.message || 'Failed to submit admission request' });
     } finally {
@@ -117,6 +119,10 @@ const AdmissionPage = () => {
                 <div>
                   <label className="block text-sm font-medium mb-1">Student Name *</label>
                   <input name="studentName" value={form.studentName} onChange={handleChange} required className="input-field" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Student Email *</label>
+                  <input type="email" name="studentEmail" value={form.studentEmail} onChange={handleChange} required className="input-field" readOnly />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Student Phone *</label>
