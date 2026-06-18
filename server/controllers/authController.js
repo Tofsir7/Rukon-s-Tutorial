@@ -8,6 +8,67 @@ const generateToken = (id) => {
   });
 };
 
+// @desc    Register a new user
+// @route   POST /api/auth/register
+exports.register = async (req, res, next) => {
+  try {
+    const { name, email, password, confirmPassword, phone } = req.body;
+
+    // Validation
+    if (!name || !email || !password || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide name, email, password, and confirm password',
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match',
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters',
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already registered. Please log in or use a different email.',
+      });
+    }
+
+    // Create user
+    const user = await User.create({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      password,
+      role: 'student',
+      status: 'active',
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Registration successful. Please log in to continue.',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Login user
 // @route   POST /api/auth/login
 exports.login = async (req, res, next) => {

@@ -307,30 +307,30 @@ const seedData = async () => {
       ],
     });
 
-    await Admission.insertMany([
-      {
-        studentName: 'Tanvir Ahmed',
-        studentPhone: '01912345678',
-        guardianPhone: '01812345678',
-        classLevel: 'Class 10',
-        schoolCollege: 'Katiadi Govt High School',
-        interestedBatch: 'SSC Physics',
-        address: 'Katiadi, Kishoreganj',
-        message: 'Interested in admission for SSC preparation',
-        status: 'pending',
-      },
-      {
-        studentName: 'Mim Akter',
-        studentPhone: '01987654321',
-        guardianPhone: '01887654321',
-        classLevel: 'Class 9',
-        schoolCollege: 'Local High School',
-        interestedBatch: 'Class 9 Math Batch A',
-        address: 'Purbapara, Katiadi',
-        message: 'Want to join math batch',
-        status: 'pending',
-      },
-    ]);
+    // await Admission.insertMany([
+    //   {
+    //     studentName: 'Tanvir Ahmed',
+    //     studentPhone: '01912345678',
+    //     guardianPhone: '01812345678',
+    //     classLevel: 'Class 10',
+    //     schoolCollege: 'Katiadi Govt High School',
+    //     interestedBatch: 'SSC Physics',
+    //     address: 'Katiadi, Kishoreganj',
+    //     message: 'Interested in admission for SSC preparation',
+    //     status: 'pending',
+    //   },
+    //   {
+    //     studentName: 'Mim Akter',
+    //     studentPhone: '01987654321',
+    //     guardianPhone: '01887654321',
+    //     classLevel: 'Class 9',
+    //     schoolCollege: 'Local High School',
+    //     interestedBatch: 'Class 9 Math Batch A',
+    //     address: 'Purbapara, Katiadi',
+    //     message: 'Want to join math batch',
+    //     status: 'pending',
+    //   },
+    // ]);
 
     console.log('\n========== SEED DATA CREATED ==========');
     console.log('\nAdmin Login:');
