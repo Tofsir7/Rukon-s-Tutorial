@@ -15,6 +15,26 @@ const emptyForm = {
   status: 'active',
 };
 
+const getGoogleDriveImageUrl = (url, name = 'Teacher') => {
+  const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1e40af&color=fff&size=96`;
+
+  if (!url) return fallback;
+
+  const imageUrl = url.trim();
+
+  const fileMatch = imageUrl.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  const idMatch = imageUrl.match(/[?&]id=([^&]+)/);
+
+  const fileId = fileMatch?.[1] || idMatch?.[1];
+
+  if (fileId) {
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  }
+
+  return imageUrl;
+};
+
+
 const AdminTeachers = () => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,11 +123,11 @@ const AdminTeachers = () => {
             <div key={teacher._id} className="card">
               <div className="flex items-start gap-4">
                 <img
-                  src={teacher.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(teacher.name)}&background=1e40af&color=fff&size=96`}
+                  src={getGoogleDriveImageUrl(teacher.photo, teacher.name)}
                   alt={teacher.name}
                   className="h-20 w-20 rounded-lg object-cover bg-gray-100 border border-gray-200"
                   onError={(e) => {
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(teacher.name)}&background=1e40af&color=fff&size=96`;
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(teacher.name || 'Teacher')}&background=1e40af&color=fff&size=96`;
                   }}
                 />
                 <div className="min-w-0 flex-1">
