@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const PAYMENT_PROVIDERS = ['bkash', 'rocket', 'nagad', 'bank'];
+
 const paymentSchema = new mongoose.Schema(
   {
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
@@ -10,7 +12,7 @@ const paymentSchema = new mongoose.Schema(
     paidAmount: { type: Number, required: true, default: 0 },
     dueAmount: { type: Number, required: true, default: 0 },
     status: { type: String, enum: ['paid', 'partial', 'due'], required: true },
-    paymentMethod: { type: String, enum: ['cash', 'bkash', 'nagad', 'rocket', 'bank', 'other'], default: 'cash' },
+    paymentMethod: { type: String, enum: PAYMENT_PROVIDERS, default: 'bkash' },
     senderAccountNumber: { type: String, default: '' },
     centerAccountNumber: { type: String, default: '' },
     transactionId: { type: String, default: '' },

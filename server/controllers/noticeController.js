@@ -1,6 +1,15 @@
 const Notice = require('../models/Notice');
 const Student = require('../models/Student');
 
+const sanitizeNoticePayload = (body) => ({
+  title: body.title,
+  description: body.description,
+  targetType: body.targetType,
+  batchId: body.targetType === 'batch' ? body.batchId : null,
+  status: body.status,
+  noticeImageUrl: String(body.noticeImageUrl || body.imageUrl || '').trim(),
+});
+
 exports.getNotices = async (req, res, next) => {
   try {
     const notices = await Notice.find().populate('batchId').sort({ createdAt: -1 });
@@ -39,7 +48,7 @@ exports.getMyNotices = async (req, res, next) => {
 
 exports.createNotice = async (req, res, next) => {
   try {
-    const notice = await Notice.create(req.body);
+    const notice = await Notice.create(sanitizeNoticePayload(req.body));
     const populated = await Notice.findById(notice._id).populate('batchId');
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
@@ -49,7 +58,7 @@ exports.createNotice = async (req, res, next) => {
 
 exports.updateNotice = async (req, res, next) => {
   try {
-    const notice = await Notice.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).populate('batchId');
+    const notice = await Notice.findByIdAndUpdate(req.params.id, sanitizeNoticePayload(req.body), { new: true, runValidators: true }).populate('batchId');
     if (!notice) return res.status(404).json({ success: false, message: 'Notice not found' });
     res.json({ success: true, data: notice });
   } catch (error) {

@@ -7,6 +7,7 @@ const noticeSchema = new mongoose.Schema(
     targetType: { type: String, enum: ['public', 'all', 'batch'], required: true },
     batchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Batch', default: null },
     status: { type: String, enum: ['draft', 'published'], default: 'published' },
+    noticeImageUrl: { type: String, trim: true, default: '' },
   },
   { timestamps: true }
 );

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const PAYMENT_PROVIDERS = ['bkash', 'rocket', 'nagad', 'bank'];
+
 const batchSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -13,7 +15,7 @@ const batchSchema = new mongoose.Schema(
     paymentInstructions: { type: String, default: '' },
     paymentAccounts: [
       {
-        provider: { type: String, enum: ['bkash', 'nagad', 'rocket', 'bank', 'cash', 'other'], required: true },
+        provider: { type: String, enum: PAYMENT_PROVIDERS, required: true },
         accountNumber: { type: String, required: true },
         accountName: { type: String, default: '' },
         isActive: { type: Boolean, default: true },

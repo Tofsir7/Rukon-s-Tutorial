@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const PAYMENT_PROVIDERS = ['', 'bkash', 'rocket', 'nagad', 'bank'];
+
 const admissionSchema = new mongoose.Schema(
   {
     applicantUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -22,7 +24,7 @@ const admissionSchema = new mongoose.Schema(
     },
     paymentOption: { type: String, enum: ['pay_now', 'pay_later'], default: 'pay_later' },
     paymentMethod: { type: String, default: '' },
-    paymentProvider: { type: String, enum: ['', 'bkash', 'nagad', 'rocket', 'bank', 'cash', 'other'], default: '' },
+    paymentProvider: { type: String, enum: PAYMENT_PROVIDERS, default: '' },
     centerAccountNumber: { type: String, default: '' },
     senderAccountNumber: { type: String, default: '' },
     transactionId: { type: String, default: '' },

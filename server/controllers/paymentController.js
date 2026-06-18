@@ -2,13 +2,25 @@ const Payment = require('../models/Payment');
 const Student = require('../models/Student');
 const { calculatePaymentStatus } = require('../utils/helpers');
 
+const VALID_PAYMENT_PROVIDERS = ['bkash', 'rocket', 'nagad', 'bank'];
+const normalizeProvider = (provider) => String(provider || '').toLowerCase();
+const validateProvider = (provider) => VALID_PAYMENT_PROVIDERS.includes(normalizeProvider(provider));
+
 exports.getPayments = async (req, res, next) => {
   try {
-    const { month, batchId, status, studentId } = req.query;
+    const { month, batchId, status, studentId, provider, search } = req.query;
     const filter = {};
     if (month) filter.month = month;
-    if (status) filter.status = status;
+    if (status === 'not_paid') {
+      filter.status = 'due';
+      filter.paidAmount = 0;
+    } else if (status === 'payment_submitted') {
+      filter.status = 'partial';
+    } else if (status) {
+      filter.status = status;
+    }
     if (studentId) filter.studentId = studentId;
+    if (provider) filter.paymentMethod = normalizeProvider(provider);
 
     let payments = await Payment.find(filter)
       .populate('studentId')
@@ -17,6 +29,28 @@ exports.getPayments = async (req, res, next) => {
 
     if (batchId) {
       payments = payments.filter((p) => p.batchId && p.batchId._id.toString() === batchId);
+    }
+    if (search) {
+      const needle = search.toLowerCase();
+      payments = payments.filter((p) => {
+        const haystack = [
+          p.studentId?.name,
+          p.studentId?.phone,
+          p.studentId?.guardianPhone,
+          p.batchId?.name,
+          p.batchId?.subject,
+          p.transactionId,
+          p.senderAccountNumber,
+          p.centerAccountNumber,
+          p.paymentMethod,
+          p.status,
+          p.month,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(needle);
+      });
     }
 
     res.json({ success: true, count: payments.length, data: payments });
@@ -37,7 +71,22 @@ exports.getPayment = async (req, res, next) => {
 
 exports.createPayment = async (req, res, next) => {
   try {
-    const { studentId, batchId, month, payableAmount, paidAmount, paymentMethod, note, paymentDate } = req.body;
+    const {
+      studentId,
+      batchId,
+      month,
+      payableAmount,
+      paidAmount,
+      paymentMethod = 'bkash',
+      senderAccountNumber,
+      centerAccountNumber,
+      transactionId,
+      note,
+      paymentDate,
+    } = req.body;
+    if (!validateProvider(paymentMethod)) {
+      return res.status(400).json({ success: false, message: 'Payment provider must be bKash, Rocket, Nagad, or Bank' });
+    }
     const { dueAmount, status } = calculatePaymentStatus(Number(payableAmount), Number(paidAmount));
 
     const payment = await Payment.create({
@@ -48,7 +97,10 @@ exports.createPayment = async (req, res, next) => {
       paidAmount,
       dueAmount,
       status,
-      paymentMethod: paymentMethod || 'cash',
+      paymentMethod: normalizeProvider(paymentMethod),
+      senderAccountNumber: senderAccountNumber || '',
+      centerAccountNumber: centerAccountNumber || '',
+      transactionId: transactionId || '',
       note,
       paymentDate: paymentDate || Date.now(),
     });
@@ -62,9 +114,12 @@ exports.createPayment = async (req, res, next) => {
 
 exports.updatePayment = async (req, res, next) => {
   try {
-    const { payableAmount, paidAmount, paymentMethod, note, paymentDate, month } = req.body;
+    const { payableAmount, paidAmount, paymentMethod, senderAccountNumber, centerAccountNumber, transactionId, note, paymentDate, month } = req.body;
     const payment = await Payment.findById(req.params.id);
     if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+    if (paymentMethod !== undefined && !validateProvider(paymentMethod)) {
+      return res.status(400).json({ success: false, message: 'Payment provider must be bKash, Rocket, Nagad, or Bank' });
+    }
 
     const payable = payableAmount !== undefined ? Number(payableAmount) : payment.payableAmount;
     const paid = paidAmount !== undefined ? Number(paidAmount) : payment.paidAmount;
@@ -72,7 +127,19 @@ exports.updatePayment = async (req, res, next) => {
 
     const updated = await Payment.findByIdAndUpdate(
       req.params.id,
-      { payableAmount: payable, paidAmount: paid, dueAmount, status, paymentMethod, note, paymentDate, month },
+      {
+        payableAmount: payable,
+        paidAmount: paid,
+        dueAmount,
+        status,
+        paymentMethod: paymentMethod === undefined ? payment.paymentMethod : normalizeProvider(paymentMethod),
+        senderAccountNumber,
+        centerAccountNumber,
+        transactionId,
+        note,
+        paymentDate,
+        month,
+      },
       { new: true, runValidators: true }
     )
       .populate('studentId')

@@ -53,6 +53,8 @@ const seedData = async () => {
         time: '4:00 PM - 6:00 PM',
         room: 'Room 101',
         monthlyFee: 1500,
+        paymentInstructions: 'Send the monthly fee before submitting admission payment details.',
+        paymentAccounts: [{ provider: 'bkash', accountNumber: '01341703221', accountName: "Rukon's Tutorial" }],
         status: 'active',
       },
       {
@@ -64,6 +66,8 @@ const seedData = async () => {
         time: '5:00 PM - 7:00 PM',
         room: 'Room 102',
         monthlyFee: 1800,
+        paymentInstructions: 'Use the listed receiving account and keep your transaction ID.',
+        paymentAccounts: [{ provider: 'rocket', accountNumber: '01341703221', accountName: "Rukon's Tutorial" }],
         status: 'active',
       },
       {
@@ -75,6 +79,8 @@ const seedData = async () => {
         time: '6:00 PM - 8:00 PM',
         room: 'Room 103',
         monthlyFee: 2000,
+        paymentInstructions: 'Send payment to the receiving account before approval.',
+        paymentAccounts: [{ provider: 'nagad', accountNumber: '01341703221', accountName: "Rukon's Tutorial" }],
         status: 'active',
       },
       {
@@ -86,6 +92,8 @@ const seedData = async () => {
         time: '7:00 AM - 9:00 AM',
         room: 'Main Hall',
         monthlyFee: 2500,
+        paymentInstructions: 'Bank transfer is accepted for this batch.',
+        paymentAccounts: [{ provider: 'bank', accountNumber: 'AC-123456789', accountName: "Rukon's Tutorial" }],
         status: 'active',
       },
     ]);
@@ -157,6 +165,7 @@ const seedData = async () => {
         description: 'Classes will begin from January 15, 2025. All students are requested to collect their routine from the office.',
         targetType: 'public',
         status: 'published',
+        noticeImageUrl: '/images/classroom.jpeg',
       },
       {
         title: 'Monthly Test Schedule',
@@ -225,7 +234,7 @@ const seedData = async () => {
         paidAmount: i % 3 === 0 ? batch.monthlyFee : i % 3 === 1 ? batch.monthlyFee / 2 : 0,
         dueAmount,
         status,
-        paymentMethod: i % 2 === 0 ? 'bkash' : 'cash',
+        paymentMethod: i % 2 === 0 ? 'bkash' : 'nagad',
         note: 'Monthly tuition fee',
       });
 
@@ -237,7 +246,7 @@ const seedData = async () => {
         paidAmount: batch.monthlyFee,
         dueAmount: 0,
         status: 'paid',
-        paymentMethod: 'cash',
+        paymentMethod: 'bank',
       });
     }
 

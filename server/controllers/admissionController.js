@@ -18,6 +18,7 @@ const populateAdmission = (query) =>
     .populate('approvedBy', 'name email');
 
 const normalizePaymentProvider = (provider) => (provider || '').toLowerCase();
+const VALID_PAYMENT_PROVIDERS = ['bkash', 'rocket', 'nagad', 'bank'];
 
 exports.getAdmissions = async (req, res, next) => {
   try {
@@ -112,8 +113,23 @@ exports.createAdmission = async (req, res, next) => {
       });
     }
 
-    const provider = normalizePaymentProvider(paymentProvider);
+    let provider = normalizePaymentProvider(paymentProvider);
+    let receivingAccount = null;
+    if (batch) {
+      const activeAccounts = (batch.paymentAccounts || []).filter((account) => account.isActive);
+      receivingAccount =
+        activeAccounts.find((account) => account.provider === provider) ||
+        activeAccounts[0] ||
+        null;
+      provider = receivingAccount?.provider || provider;
+    }
     const wantsToPayNow = paymentOption === 'pay_now';
+    if (wantsToPayNow && !VALID_PAYMENT_PROVIDERS.includes(provider)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment provider must be bKash, Rocket, Nagad, or Bank',
+      });
+    }
     if (wantsToPayNow && (!provider || !senderAccountNumber || !transactionId || Number(paidAmount) <= 0)) {
       return res.status(400).json({
         success: false,
@@ -142,7 +158,7 @@ exports.createAdmission = async (req, res, next) => {
       paymentStatus: wantsToPayNow ? 'payment_submitted' : 'not_paid',
       paymentMethod: provider,
       paymentProvider: provider,
-      centerAccountNumber: centerAccountNumber || '',
+      centerAccountNumber: receivingAccount?.accountNumber || centerAccountNumber || '',
       senderAccountNumber: wantsToPayNow ? senderAccountNumber : '',
       transactionId: wantsToPayNow ? transactionId : '',
       payableAmount,
@@ -219,7 +235,9 @@ exports.approveAdmission = async (req, res, next) => {
           paidAmount,
           dueAmount,
           status: paymentRecordStatus,
-          paymentMethod: admission.paymentProvider || admission.paymentMethod || 'cash',
+          paymentMethod: VALID_PAYMENT_PROVIDERS.includes(admission.paymentProvider)
+            ? admission.paymentProvider
+            : 'bkash',
           senderAccountNumber: admission.senderAccountNumber || '',
           centerAccountNumber: admission.centerAccountNumber || '',
           transactionId: admission.transactionId || '',
