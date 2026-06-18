@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
-import { formatCurrency } from '../../utils/constants';
+import { formatCurrency, paymentMethodLabel } from '../../utils/constants';
 import { useAuth } from '../../context/AuthContext';
 
 const CoursesPage = () => {
@@ -56,7 +56,7 @@ const CoursesPage = () => {
                       <p>Room: {batch.room}</p>
                       <p>Monthly Fee: <strong>{formatCurrency(batch.monthlyFee)}</strong></p>
                       {paymentAccount && (
-                        <p>Payment: <strong className="capitalize">{paymentAccount.provider}</strong> {paymentAccount.accountNumber}</p>
+                        <p>Payment: <strong>{paymentMethodLabel(paymentAccount.provider)}</strong> {paymentAccount.accountNumber}</p>
                       )}
                     </div>
                     <button onClick={() => handleApply(batch._id)} className="btn-primary w-full text-center block text-sm">Apply for This Batch</button>

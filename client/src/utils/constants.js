@@ -14,13 +14,14 @@ export const SITE = {
 };
 
 export const PAYMENT_METHODS = [
-  { value: 'cash', label: 'Cash' },
   { value: 'bkash', label: 'bKash' },
-  { value: 'nagad', label: 'Nagad' },
   { value: 'rocket', label: 'Rocket' },
+  { value: 'nagad', label: 'Nagad' },
   { value: 'bank', label: 'Bank' },
-  { value: 'other', label: 'Other' },
 ];
+
+export const paymentMethodLabel = (value) =>
+  PAYMENT_METHODS.find((method) => method.value === value)?.label || value || '-';
 
 export const MATERIAL_TYPES = [
   { value: 'pdf', label: 'PDF' },

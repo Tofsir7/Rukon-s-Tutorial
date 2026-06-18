@@ -103,28 +103,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-primary-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="section-title text-center mb-12">Student Success Stories</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { name: 'SSC 2024', result: '15 A+ in Science', student: 'Multiple students' },
-              { name: 'HSC 2024', result: 'GPA 5.00', student: 'Science Group' },
-              { name: 'Admission Test', result: 'Medical & Engineering', student: 'Top universities' },
-            ].map((item) => (
-              <div key={item.name} className="card bg-white">
-                <div className="text-accent-600 font-bold text-2xl mb-2">{item.result}</div>
-                <h3 className="font-semibold">{item.name}</h3>
-                <p className="text-gray-500 text-sm">{item.student}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link to="/results" className="btn-primary">View All Results</Link>
-          </div>
-        </div>
-      </section>
-
       {notices.length > 0 && (
         <section className="py-12 bg-white border-t">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

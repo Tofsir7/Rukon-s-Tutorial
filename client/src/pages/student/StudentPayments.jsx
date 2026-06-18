@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import StatusBadge from '../../components/StatusBadge';
-import { formatCurrency } from '../../utils/constants';
+import { formatCurrency, paymentMethodLabel } from '../../utils/constants';
 
 const StudentPayments = () => {
   const [payments, setPayments] = useState([]);
@@ -34,7 +34,7 @@ const StudentPayments = () => {
                 <td className="py-3">{formatCurrency(p.payableAmount)}</td>
                 <td className="py-3">{formatCurrency(p.paidAmount)}</td>
                 <td className="py-3">{formatCurrency(p.dueAmount)}</td>
-                <td className="py-3 capitalize">{p.paymentMethod}</td>
+                <td className="py-3">{paymentMethodLabel(p.paymentMethod)}</td>
                 <td className="py-3"><StatusBadge status={p.status} /></td>
               </tr>
             ))}

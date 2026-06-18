@@ -12,14 +12,26 @@ const AdminNotices = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ title: '', description: '', targetType: 'all', batchId: '', status: 'published' });
+  const emptyForm = { title: '', description: '', targetType: 'all', batchId: '', status: 'published', noticeImageUrl: '' };
+  const [form, setForm] = useState(emptyForm);
   const [alert, setAlert] = useState({ type: '', message: '' });
 
   const fetch = () => api.get('/notices').then((r) => setNotices(r.data.data));
   useEffect(() => { Promise.all([fetch(), api.get('/batches')]).then(([, b]) => setBatches(b.data.data)).finally(() => setLoading(false)); }, []);
 
-  const openCreate = () => { setEditId(null); setForm({ title: '', description: '', targetType: 'all', batchId: '', status: 'published' }); setModalOpen(true); };
-  const openEdit = (n) => { setEditId(n._id); setForm({ title: n.title, description: n.description, targetType: n.targetType, batchId: n.batchId?._id || '', status: n.status }); setModalOpen(true); };
+  const openCreate = () => { setEditId(null); setForm(emptyForm); setModalOpen(true); };
+  const openEdit = (n) => {
+    setEditId(n._id);
+    setForm({
+      title: n.title,
+      description: n.description,
+      targetType: n.targetType,
+      batchId: n.batchId?._id || '',
+      status: n.status,
+      noticeImageUrl: n.noticeImageUrl || '',
+    });
+    setModalOpen(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +68,9 @@ const AdminNotices = () => {
               <h3 className="font-bold">{n.title}</h3>
               <div className="flex gap-2"><StatusBadge status={n.status} /><span className="text-xs bg-gray-100 px-2 py-0.5 rounded capitalize">{n.targetType}</span></div>
             </div>
+            {n.noticeImageUrl && (
+              <img src={n.noticeImageUrl} alt={n.title} className="mb-3 max-h-64 w-full rounded-lg object-cover" />
+            )}
             <p className="text-gray-600 text-sm mb-3">{n.description}</p>
             <div className="flex gap-3 text-sm">
               <button onClick={() => openEdit(n)} className="text-primary-600 hover:underline">Edit</button>
@@ -69,6 +84,22 @@ const AdminNotices = () => {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div><label className="text-sm font-medium">Title</label><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required className="input-field" /></div>
           <div><label className="text-sm font-medium">Description</label><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required rows={4} className="input-field" /></div>
+          <div>
+            <label className="text-sm font-medium">Notice Image URL</label>
+            <input
+              type="url"
+              value={form.noticeImageUrl}
+              onChange={(e) => setForm({ ...form, noticeImageUrl: e.target.value })}
+              placeholder="https://example.com/notice.jpg"
+              className="input-field"
+            />
+          </div>
+          {form.noticeImageUrl && (
+            <div className="rounded-lg border p-2">
+              <img src={form.noticeImageUrl} alt="Notice preview" className="max-h-56 w-full rounded object-cover" />
+              <button type="button" onClick={() => setForm({ ...form, noticeImageUrl: '' })} className="mt-2 text-sm text-red-600 hover:underline">Remove image</button>
+            </div>
+          )}
           <div><label className="text-sm font-medium">Target</label><select value={form.targetType} onChange={(e) => setForm({ ...form, targetType: e.target.value })} className="input-field">{NOTICE_TARGETS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select></div>
           {form.targetType === 'batch' && <div><label className="text-sm font-medium">Batch</label><select value={form.batchId} onChange={(e) => setForm({ ...form, batchId: e.target.value })} required className="input-field"><option value="">Select</option>{batches.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}</select></div>}
           <div><label className="text-sm font-medium">Status</label><select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="input-field"><option value="published">Published</option><option value="draft">Draft</option></select></div>

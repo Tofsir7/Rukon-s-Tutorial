@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import Alert from '../../components/Alert';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { PAYMENT_METHODS, formatCurrency } from '../../utils/constants';
+import { PAYMENT_METHODS, formatCurrency, paymentMethodLabel } from '../../utils/constants';
 import { useAuth } from '../../context/AuthContext';
 
 const initialForm = {
@@ -66,17 +66,33 @@ const AdmissionPage = () => {
   );
 
   const activePaymentAccounts = selectedBatch?.paymentAccounts?.filter((account) => account.isActive) || [];
+  const paymentProviderOptions = activePaymentAccounts.length
+    ? activePaymentAccounts.map((account) => ({
+        value: account.provider,
+        label: `${paymentMethodLabel(account.provider)} - ${account.accountNumber}`,
+      }))
+    : PAYMENT_METHODS;
 
   useEffect(() => {
     const firstAccount = activePaymentAccounts[0];
     setForm((prev) => ({
       ...prev,
       centerAccountNumber: firstAccount?.accountNumber || prev.centerAccountNumber,
-      paymentProvider: prev.paymentProvider || firstAccount?.provider || '',
+      paymentProvider: firstAccount?.provider || '',
     }));
   }, [selectedBatch?._id]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handlePaymentProviderChange = (e) => {
+    const provider = e.target.value;
+    const selectedAccount = activePaymentAccounts.find((account) => account.provider === provider);
+    setForm({
+      ...form,
+      paymentProvider: provider,
+      centerAccountNumber: selectedAccount?.accountNumber || '',
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -160,7 +176,7 @@ const AdmissionPage = () => {
                     <div className="mt-2 space-y-1">
                       {activePaymentAccounts.map((account) => (
                         <p key={`${account.provider}-${account.accountNumber}`}>
-                          <span className="font-medium capitalize">{account.provider}</span>: {account.accountNumber}
+                          <span className="font-medium">{paymentMethodLabel(account.provider)}</span>: {account.accountNumber}
                           {account.accountName ? ` (${account.accountName})` : ''}
                         </p>
                       ))}
@@ -185,7 +201,7 @@ const AdmissionPage = () => {
                 <div className="grid sm:grid-cols-2 gap-3">
                   <label className="flex items-center gap-2 rounded-lg border p-3">
                     <input type="radio" name="paymentOption" value="pay_now" checked={form.paymentOption === 'pay_now'} onChange={handleChange} />
-                    Pay now using mobile banking
+                    Pay now using the receiving account
                   </label>
                   <label className="flex items-center gap-2 rounded-lg border p-3">
                     <input type="radio" name="paymentOption" value="pay_later" checked={form.paymentOption === 'pay_later'} onChange={handleChange} />
@@ -197,16 +213,22 @@ const AdmissionPage = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Payment Provider *</label>
-                      <select name="paymentProvider" value={form.paymentProvider} onChange={handleChange} required className="input-field">
+                      <select
+                        name="paymentProvider"
+                        value={form.paymentProvider}
+                        onChange={handlePaymentProviderChange}
+                        required
+                        className="input-field"
+                      >
                         <option value="">Select provider</option>
-                        {PAYMENT_METHODS.map((method) => (
+                        {paymentProviderOptions.map((method) => (
                           <option key={method.value} value={method.value}>{method.label}</option>
                         ))}
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">Center Receiving Account *</label>
-                      <input name="centerAccountNumber" value={form.centerAccountNumber} onChange={handleChange} required className="input-field" />
+                      <input name="centerAccountNumber" value={form.centerAccountNumber} required readOnly className="input-field bg-gray-50" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">Sender Account/Mobile *</label>

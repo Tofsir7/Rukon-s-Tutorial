@@ -7,7 +7,6 @@ import HomePage from './pages/public/HomePage';
 import AboutPage from './pages/public/AboutPage';
 import CoursesPage from './pages/public/CoursesPage';
 import TeachersPage from './pages/public/TeachersPage';
-import ResultsPage from './pages/public/ResultsPage';
 import AdmissionPage from './pages/public/AdmissionPage';
 import NoticesPage from './pages/public/NoticesPage';
 import ContactPage from './pages/public/ContactPage';
@@ -43,7 +42,6 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/teachers" element={<TeachersPage />} />
-        <Route path="/results" element={<ResultsPage />} />
         <Route path="/admission" element={<AdmissionPage />} />
         <Route path="/notices" element={<NoticesPage />} />
         <Route path="/contact" element={<ContactPage />} />

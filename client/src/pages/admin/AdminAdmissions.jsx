@@ -4,7 +4,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import Alert from '../../components/Alert';
 import StatusBadge from '../../components/StatusBadge';
 import Modal from '../../components/Modal';
-import { formatCurrency, formatDate } from '../../utils/constants';
+import { formatCurrency, formatDate, paymentMethodLabel } from '../../utils/constants';
 
 const AdminAdmissions = () => {
   const [admissions, setAdmissions] = useState([]);
@@ -127,7 +127,7 @@ const AdminAdmissions = () => {
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={admission.paymentStatus} />
-                  <p className="mt-1 text-gray-500 capitalize">{admission.paymentProvider || admission.paymentMethod || 'No payment'}</p>
+                  <p className="mt-1 text-gray-500">{paymentMethodLabel(admission.paymentProvider || admission.paymentMethod) || 'No payment'}</p>
                   <p className="text-gray-500">TXN: {admission.transactionId || '-'}</p>
                   <p className="text-gray-500">Paid {formatCurrency(admission.paidAmount)} | Due {formatCurrency(admission.dueAmount)}</p>
                 </td>

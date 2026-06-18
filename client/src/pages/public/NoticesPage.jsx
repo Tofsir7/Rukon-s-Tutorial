@@ -35,6 +35,13 @@ const NoticesPage = () => {
                     <span className="text-sm text-gray-500">{formatDate(notice.createdAt)}</span>
                   </div>
                   <h3 className="text-lg font-bold mb-2">{notice.title}</h3>
+                  {notice.noticeImageUrl && (
+                    <img
+                      src={notice.noticeImageUrl}
+                      alt={notice.title}
+                      className="mb-3 max-h-80 w-full rounded-lg object-cover"
+                    />
+                  )}
                   <p className="text-gray-600 whitespace-pre-wrap">{notice.description}</p>
                 </div>
               ))}

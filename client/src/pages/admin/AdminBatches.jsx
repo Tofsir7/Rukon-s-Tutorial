@@ -4,7 +4,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import Alert from '../../components/Alert';
 import StatusBadge from '../../components/StatusBadge';
 import Modal from '../../components/Modal';
-import { formatCurrency } from '../../utils/constants';
+import { PAYMENT_METHODS, formatCurrency, paymentMethodLabel } from '../../utils/constants';
 
 const emptyForm = {
   name: '',
@@ -132,7 +132,7 @@ const AdminBatches = () => {
                 <p>{batch.schedule} | {batch.time}</p>
                 <p>Room {batch.room}</p>
                 <p>{formatCurrency(batch.monthlyFee)}/month</p>
-                {account && <p>Payment: <span className="capitalize">{account.provider}</span> {account.accountNumber}</p>}
+                {account && <p>Payment: <span>{paymentMethodLabel(account.provider)}</span> {account.accountNumber}</p>}
               </div>
               <div className="flex gap-2 flex-wrap">
                 <button onClick={() => viewStudents(batch)} className="text-sm text-primary-600 hover:underline">Students</button>
@@ -167,12 +167,9 @@ const AdminBatches = () => {
             <div>
               <label className="text-sm font-medium">Payment Provider</label>
               <select value={form.paymentProvider} onChange={(e) => setForm({ ...form, paymentProvider: e.target.value })} className="input-field">
-                <option value="bkash">bKash</option>
-                <option value="nagad">Nagad</option>
-                <option value="rocket">Rocket</option>
-                <option value="bank">Bank</option>
-                <option value="cash">Cash</option>
-                <option value="other">Other</option>
+                {PAYMENT_METHODS.map((method) => (
+                  <option key={method.value} value={method.value}>{method.label}</option>
+                ))}
               </select>
             </div>
             <div>
