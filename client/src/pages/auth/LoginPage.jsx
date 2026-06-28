@@ -70,10 +70,10 @@ const LoginPage = () => {
           </p>
         </div>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg text-xs text-gray-500">
+        {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg text-xs text-gray-500">
           <p className="font-medium text-gray-700 mb-2">Demo Credentials:</p>
           {/* <p><strong>Admin:</strong> admin@rukons.com / admin123</p>
-          <p><strong>Student:</strong> arif@rukons.com / student123</p> */}
+          <p><strong>Student:</strong> arif@rukons.com / student123</p> */} */}
         </div>
       </div>
     </div>
